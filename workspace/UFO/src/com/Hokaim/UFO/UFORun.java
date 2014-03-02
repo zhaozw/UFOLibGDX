@@ -10,7 +10,10 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -20,27 +23,32 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class UFORun implements ApplicationListener {
    Texture dropImage;
    Texture bucketImage;
+   Texture backgroundImage;
 //   Sound dropSound;
-//   Music rainMusic;
+   Music rainMusic;
    SpriteBatch batch;
    OrthographicCamera camera;
    Rectangle bucket;
    Array<Rectangle> raindrops;
    long lastDropTime;
+   Sprite backgroundSprite;
 
    @Override
    public void create() {
       // load the images for the droplet and the bucket, 64x64 pixels each
       dropImage = new Texture(Gdx.files.internal("data/droplet.png"));
       bucketImage = new Texture(Gdx.files.internal("data/bucket.png"));
+      backgroundImage = new Texture(Gdx.files.internal("data/libgdx.png"));
+
+      backgroundImage.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
       // load the drop sound effect and the rain background "music"
 //      dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-//      rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+      rainMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Robert Miles - Children.mp3"));
 
       // start the playback of the background music immediately
-//      rainMusic.setLooping(true);
-//      rainMusic.play();
+      rainMusic.setLooping(true);
+      rainMusic.play();
 
       // create the camera and the SpriteBatch
       camera = new OrthographicCamera();
@@ -57,6 +65,14 @@ public class UFORun implements ApplicationListener {
       // create the raindrops array and spawn the first raindrop
       raindrops = new Array<Rectangle>();
       spawnRaindrop();
+      
+      TextureRegion backgroundRegion = new TextureRegion(backgroundImage, 0, 0, 512, 275);
+
+      backgroundSprite = new Sprite(backgroundRegion);
+      backgroundSprite.setSize(0.9f, 0.9f * backgroundSprite.getHeight() / backgroundSprite.getWidth());
+      backgroundSprite.setOrigin(backgroundSprite.getWidth()/2, backgroundSprite.getHeight()/2);
+      backgroundSprite.setPosition(-backgroundSprite.getWidth()/2, -backgroundSprite.getHeight()/2);
+
    }
 
    private void spawnRaindrop() {
@@ -88,6 +104,7 @@ public class UFORun implements ApplicationListener {
       // begin a new batch and draw the bucket and
       // all drops
       batch.begin();
+      batch.draw(backgroundSprite, 0, 0, 800, 480);
       batch.draw(bucketImage, bucket.x, bucket.y);
       for(Rectangle raindrop: raindrops) {
          batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -115,7 +132,7 @@ public class UFORun implements ApplicationListener {
       
 
       // check if we need to create a new raindrop
-      if(TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+      if(TimeUtils.nanoTime() - lastDropTime > 50000000) spawnRaindrop();
 
       // move the raindrops, remove any that are beneath the bottom edge of
       // the screen or that hit the bucket. In the later case we play back
@@ -138,7 +155,7 @@ public class UFORun implements ApplicationListener {
       dropImage.dispose();
       bucketImage.dispose();
 //      dropSound.dispose();
-//      rainMusic.dispose();
+      rainMusic.dispose();
       batch.dispose();
    }
 
