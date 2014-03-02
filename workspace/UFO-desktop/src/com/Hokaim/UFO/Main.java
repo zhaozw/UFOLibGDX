@@ -8,9 +8,9 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "UFO";
 		cfg.useGL20 = false;
-		cfg.width = 480;
-		cfg.height = 320;
+		cfg.width = 800;
+		cfg.height = 480;
 		
-		new LwjglApplication(new MyGdxGame(), cfg);
+		new LwjglApplication(new UFORun(), cfg);
 	}
 }
