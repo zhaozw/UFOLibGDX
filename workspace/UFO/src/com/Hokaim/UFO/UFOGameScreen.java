@@ -2,17 +2,15 @@ package com.Hokaim.UFO;
 
 import java.util.Iterator;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,21 +18,25 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
-public class UFORun implements ApplicationListener {
+public class UFOGameScreen implements Screen {
+
+	final UFO game;
+	
    Texture dropImage;
    Texture bucketImage;
    Texture backgroundImage;
-//   Sound dropSound;
+   Sound dropSound;
    Music rainMusic;
-   SpriteBatch batch;
+//   SpriteBatch batch;
    OrthographicCamera camera;
    Rectangle bucket;
    Array<Rectangle> raindrops;
    long lastDropTime;
    Sprite backgroundSprite;
 
-   @Override
-   public void create() {
+   public UFOGameScreen(final UFO gam) {
+	   this.game = gam;
+	   
       // load the images for the droplet and the bucket, 64x64 pixels each
       dropImage = new Texture(Gdx.files.internal("data/droplet.png"));
       bucketImage = new Texture(Gdx.files.internal("data/bucket.png"));
@@ -43,17 +45,16 @@ public class UFORun implements ApplicationListener {
       backgroundImage.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
       // load the drop sound effect and the rain background "music"
-//      dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+      dropSound = Gdx.audio.newSound(Gdx.files.internal("data/explosion.wav"));
       rainMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Robert Miles - Children.mp3"));
 
       // start the playback of the background music immediately
       rainMusic.setLooping(true);
-      rainMusic.play();
 
       // create the camera and the SpriteBatch
       camera = new OrthographicCamera();
       camera.setToOrtho(false, 800, 480);
-      batch = new SpriteBatch();
+//      batch = new SpriteBatch();
 
       // create a Rectangle to logically represent the bucket
       bucket = new Rectangle();
@@ -86,30 +87,30 @@ public class UFORun implements ApplicationListener {
    }
 
    @Override
-   public void render() {
+   public void render(float delta) {
       // clear the screen with a dark blue color. The
       // arguments to glClearColor are the red, green
       // blue and alpha component in the range [0,1]
       // of the color to be used to clear the screen.
-      Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-      Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+//      Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+//      Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
       // tell the camera to update its matrices.
       camera.update();
 
       // tell the SpriteBatch to render in the
       // coordinate system specified by the camera.
-      batch.setProjectionMatrix(camera.combined);
+      game.batch.setProjectionMatrix(camera.combined);
 
       // begin a new batch and draw the bucket and
       // all drops
-      batch.begin();
-      batch.draw(backgroundSprite, 0, 0, 800, 480);
-      batch.draw(bucketImage, bucket.x, bucket.y);
+      game.batch.begin();
+      game.batch.draw(backgroundSprite, 0, 0, 800, 480);
+      game.batch.draw(bucketImage, bucket.x, bucket.y);
       for(Rectangle raindrop: raindrops) {
-         batch.draw(dropImage, raindrop.x, raindrop.y);
+         game.batch.draw(dropImage, raindrop.x, raindrop.y);
       }
-      batch.end();
+      game.batch.end();
 
       // process user input
       if(Gdx.input.isTouched()) {
@@ -154,9 +155,8 @@ public class UFORun implements ApplicationListener {
       // dispose of all the native resources
       dropImage.dispose();
       bucketImage.dispose();
-//      dropSound.dispose();
+      dropSound.dispose();
       rainMusic.dispose();
-      batch.dispose();
    }
 
    @Override
@@ -169,5 +169,17 @@ public class UFORun implements ApplicationListener {
 
    @Override
    public void resume() {
+   }
+
+   @Override
+   public void show() {
+	   // start the playback of the background music
+	   // when the screen is shown
+	   rainMusic.play();
+   }
+
+   @Override
+   public void hide() {
+
    }
 }

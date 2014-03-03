@@ -1,6 +1,6 @@
 package com.Hokaim.UFO.client;
 
-import com.Hokaim.UFO.UFORun;
+import com.Hokaim.UFO.UFOGameScreen;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
@@ -14,6 +14,6 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener getApplicationListener () {
-		return new UFORun();
+		return new UFOGameScreen();
 	}
 }
