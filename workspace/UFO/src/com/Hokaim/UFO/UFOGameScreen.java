@@ -25,7 +25,7 @@ public class UFOGameScreen implements Screen {
    Texture dropImage;
    Texture bucketImage;
    Texture backgroundImage;
-   Sound dropSound;
+//   Sound dropSound;
    Music rainMusic;
 //   SpriteBatch batch;
    OrthographicCamera camera;
@@ -45,7 +45,7 @@ public class UFOGameScreen implements Screen {
       backgroundImage.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
       // load the drop sound effect and the rain background "music"
-      dropSound = Gdx.audio.newSound(Gdx.files.internal("data/explosion.wav"));
+//      dropSound = Gdx.audio.newSound(Gdx.files.internal("data/explosion.wav"));
       rainMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Robert Miles - Children.mp3"));
 
       // start the playback of the background music immediately
@@ -111,7 +111,7 @@ public class UFOGameScreen implements Screen {
          game.batch.draw(dropImage, raindrop.x, raindrop.y);
       }
       game.batch.end();
-
+      
       // process user input
       if(Gdx.input.isTouched()) {
          Vector3 touchPos = new Vector3();
@@ -120,6 +120,12 @@ public class UFOGameScreen implements Screen {
          bucket.x = touchPos.x - 64 / 2;
          bucket.y = touchPos.y - 62 / 2;
       }
+      //TODO: will be a isAccelOn flag later
+      if(!Gdx.input.isTouched()) {
+          bucket.x = Gdx.input.getAccelerometerY() * 80 + 400;
+          bucket.y = Gdx.input.getAccelerometerX() * 48 * -1 + 240;
+       }
+      
       if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
       if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
       if(Gdx.input.isKeyPressed(Keys.DOWN)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
@@ -155,7 +161,7 @@ public class UFOGameScreen implements Screen {
       // dispose of all the native resources
       dropImage.dispose();
       bucketImage.dispose();
-      dropSound.dispose();
+//      dropSound.dispose();
       rainMusic.dispose();
    }
 
