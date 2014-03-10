@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -22,20 +23,23 @@ public class UFOGameScreen implements Screen {
 
 	final UFO game;
 	
+	Preferences gameplayPrefs;
+	
    Texture dropImage;
    Texture bucketImage;
    Texture backgroundImage;
 //   Sound dropSound;
    Music rainMusic;
-//   SpriteBatch batch;
    OrthographicCamera camera;
    Rectangle bucket;
    Array<Rectangle> raindrops;
    long lastDropTime;
    Sprite backgroundSprite;
+   boolean isMoving = false;
 
-   public UFOGameScreen(final UFO gam) {
+   public UFOGameScreen(final UFO gam, Preferences pref) {
 	   this.game = gam;
+	   this.gameplayPrefs = pref;
 	   
       // load the images for the droplet and the bucket, 64x64 pixels each
       dropImage = new Texture(Gdx.files.internal("data/droplet.png"));
@@ -54,7 +58,6 @@ public class UFOGameScreen implements Screen {
       // create the camera and the SpriteBatch
       camera = new OrthographicCamera();
       camera.setToOrtho(false, 800, 480);
-//      batch = new SpriteBatch();
 
       // create a Rectangle to logically represent the bucket
       bucket = new Rectangle();
@@ -88,12 +91,6 @@ public class UFOGameScreen implements Screen {
 
    @Override
    public void render(float delta) {
-      // clear the screen with a dark blue color. The
-      // arguments to glClearColor are the red, green
-      // blue and alpha component in the range [0,1]
-      // of the color to be used to clear the screen.
-//      Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-//      Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
       // tell the camera to update its matrices.
       camera.update();
@@ -107,49 +104,66 @@ public class UFOGameScreen implements Screen {
       game.batch.begin();
       game.batch.draw(backgroundSprite, 0, 0, 800, 480);
       game.batch.draw(bucketImage, bucket.x, bucket.y);
-      for(Rectangle raindrop: raindrops) {
+      for (Rectangle raindrop: raindrops) {
          game.batch.draw(dropImage, raindrop.x, raindrop.y);
       }
       game.batch.end();
       
       // process user input
-      if(Gdx.input.isTouched()) {
-         Vector3 touchPos = new Vector3();
-         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-         camera.unproject(touchPos);
-         bucket.x = touchPos.x - 64 / 2;
-         bucket.y = touchPos.y - 62 / 2;
-      }
       //TODO: will be a isAccelOn flag later
-      if(!Gdx.input.isTouched()) {
+      if (gameplayPrefs.getBoolean("useAccel")) {
           bucket.x = Gdx.input.getAccelerometerY() * 80 + 400;
           bucket.y = Gdx.input.getAccelerometerX() * 48 * -1 + 240;
        }
       
-      if(Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
-      if(Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
-      if(Gdx.input.isKeyPressed(Keys.DOWN)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
-      if(Gdx.input.isKeyPressed(Keys.UP)) bucket.y += 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.justTouched()) {
+         Vector3 touchPos = new Vector3();
+         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
+         if (touchPos.x >= bucket.x && touchPos.x <= bucket.x + 64
+               && touchPos.y >= bucket.y && touchPos.y <= bucket.y + 64) {
+            isMoving = true;
+         }
+         else {
+            isMoving = false;
+         }
+      }
+      
+      if (Gdx.input.isTouched() && isMoving) {
+         Vector3 touchPos = new Vector3();
+         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
+//         if (touchPos.x >= bucket.x && touchPos.x <= bucket.x + 64
+//               && touchPos.y >= bucket.y && touchPos.y <= bucket.y + 64) {
+            bucket.x = touchPos.x - 64 / 2;
+            bucket.y = touchPos.y - 62 / 2;
+//         }
+      }
+
+      if (Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.RIGHT)) bucket.x += 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.DOWN)) bucket.y -= 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.UP)) bucket.y += 200 * Gdx.graphics.getDeltaTime();
 
       // make sure the bucket stays within the screen bounds
-      if(bucket.x < 0) bucket.x = 0;
-      if(bucket.x > 800 - 64) bucket.x = 800 - 64;
-      if(bucket.y < 0) bucket.y = 0;
-      if(bucket.y > 480 - 64) bucket.y = 480 - 64;
+      if (bucket.x < 0) bucket.x = 0;
+      if (bucket.x > 800 - 64) bucket.x = 800 - 64;
+      if (bucket.y < 0) bucket.y = 0;
+      if (bucket.y > 480 - 64) bucket.y = 480 - 64;
       
 
       // check if we need to create a new raindrop
-      if(TimeUtils.nanoTime() - lastDropTime > 50000000) spawnRaindrop();
+      if (TimeUtils.nanoTime() - lastDropTime > 50000000) spawnRaindrop();
 
       // move the raindrops, remove any that are beneath the bottom edge of
       // the screen or that hit the bucket. In the later case we play back
       // a sound effect as well.
       Iterator<Rectangle> iter = raindrops.iterator();
-      while(iter.hasNext()) {
+      while (iter.hasNext()) {
          Rectangle raindrop = iter.next();
          raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-         if(raindrop.y + 64 < 0) iter.remove();
-         if(raindrop.overlaps(bucket)) {
+         if (raindrop.y + 64 < 0) iter.remove();
+         if (raindrop.overlaps(bucket)) {
 //            dropSound.play();
             iter.remove();
          }
@@ -181,7 +195,9 @@ public class UFOGameScreen implements Screen {
    public void show() {
 	   // start the playback of the background music
 	   // when the screen is shown
-	   rainMusic.play();
+      if (gameplayPrefs.getBoolean("playMusic")) {
+         rainMusic.play();
+      }
    }
 
    @Override
