@@ -23,11 +23,13 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class UFOGameScreen implements Screen {
 
 	final UFO game;
+	final int UFO_WIDTH = 64;
+	final int UFO_HEIGHT = 64;
 	
    Texture dropImage;
    Texture bucketImage;
    Texture backgroundImage;
-//   Sound dropSound;
+   Sound dropSound;
    Music rainMusic;
    OrthographicCamera camera;
    Rectangle bucket;
@@ -47,7 +49,7 @@ public class UFOGameScreen implements Screen {
       backgroundImage.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
       // load the drop sound effect and the rain background "music"
-//      dropSound = Gdx.audio.newSound(Gdx.files.internal("data/explosion.wav"));
+      dropSound = Gdx.audio.newSound(Gdx.files.internal("data/smb3_coin.wav"));
       rainMusic = Gdx.audio.newMusic(Gdx.files.internal("data/Robert Miles - Children.mp3"));
 
       // start the playback of the background music immediately
@@ -59,10 +61,10 @@ public class UFOGameScreen implements Screen {
 
       // create a Rectangle to logically represent the bucket
       bucket = new Rectangle();
-      bucket.x = UFO.SCREEN_WIDTH / 2 - 64 / 2; // center the bucket horizontally
+      bucket.x = UFO.SCREEN_WIDTH / 2 - UFO_WIDTH / 2; // center the bucket horizontally
       bucket.y = 20; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
-      bucket.width = 64;
-      bucket.height = 64;
+      bucket.width = UFO_WIDTH;
+      bucket.height = UFO_HEIGHT;
 
       // create the raindrops array and spawn the first raindrop
       raindrops = new Array<Rectangle>();
@@ -121,7 +123,9 @@ public class UFOGameScreen implements Screen {
          raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
          if (raindrop.y + 64 < 0) iter.remove();
          if (raindrop.overlaps(bucket)) {
-//            dropSound.play();
+            if (UFO.prefs.getBoolean("playSounds")) {
+               dropSound.play();
+            }
             iter.remove();
          }
       }
@@ -139,8 +143,8 @@ public class UFOGameScreen implements Screen {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
          camera.unproject(touchPos);
-         if (touchPos.x >= bucket.x && touchPos.x <= bucket.x + 64
-               && touchPos.y >= bucket.y && touchPos.y <= bucket.y + 64) {
+         if (touchPos.x >= bucket.x - (UFO_WIDTH / 2) && touchPos.x <= bucket.x + UFO_WIDTH * 3 / 2
+               && touchPos.y >= bucket.y - (UFO_HEIGHT / 2) && touchPos.y <= bucket.y + UFO_HEIGHT * 3 / 2) {
             isMoving = true;
          }
          else {
@@ -152,8 +156,8 @@ public class UFOGameScreen implements Screen {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
          camera.unproject(touchPos);
-         bucket.x = touchPos.x - 64 / 2;
-         bucket.y = touchPos.y - 62 / 2;
+         bucket.x = touchPos.x - UFO_WIDTH / 2;
+         bucket.y = touchPos.y - UFO_HEIGHT / 2;
       }
 
       if (Gdx.input.isKeyPressed(Keys.LEFT)) bucket.x -= 200 * Gdx.graphics.getDeltaTime();
@@ -163,9 +167,9 @@ public class UFOGameScreen implements Screen {
 
       // make sure the bucket stays within the screen bounds
       if (bucket.x < 0) bucket.x = 0;
-      if (bucket.x > UFO.SCREEN_WIDTH - 64) bucket.x = UFO.SCREEN_WIDTH - 64;
+      if (bucket.x > UFO.SCREEN_WIDTH - UFO_WIDTH) bucket.x = UFO.SCREEN_WIDTH - UFO_WIDTH;
       if (bucket.y < 0) bucket.y = 0;
-      if (bucket.y > UFO.SCREEN_HEIGHT - 64) bucket.y = UFO.SCREEN_HEIGHT - 64;
+      if (bucket.y > UFO.SCREEN_HEIGHT - UFO_HEIGHT) bucket.y = UFO.SCREEN_HEIGHT - UFO_HEIGHT;
       
    }
 
@@ -174,7 +178,7 @@ public class UFOGameScreen implements Screen {
       // dispose of all the native resources
       dropImage.dispose();
       bucketImage.dispose();
-//      dropSound.dispose();
+      dropSound.dispose();
       rainMusic.dispose();
    }
 

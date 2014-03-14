@@ -59,6 +59,12 @@ public class UFOMainMenuScreen implements Screen {
       else {
          game.font.draw(game.batch, "music is off", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
       }
+      if (UFO.prefs.getBoolean("playSounds")) {
+         game.font.draw(game.batch, "SOUNDS ARE ON!", UFO.SCREEN_WIDTH * 3 / 4, UFO.SCREEN_HEIGHT / 4);
+      }
+      else {
+         game.font.draw(game.batch, "sounds are off", UFO.SCREEN_WIDTH * 3 / 4, UFO.SCREEN_HEIGHT / 4);
+      }
       if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
          if (UFO.prefs.getBoolean("useAccel")) {
             game.font.draw(game.batch, "ACCEL IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4 * 3);
@@ -77,6 +83,14 @@ public class UFOMainMenuScreen implements Screen {
          if (touchPos.x <= UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
             game.setScreen(new UFOGameScreen(game));
             dispose();
+         }
+         else if (touchPos.x > UFO.SCREEN_WIDTH * 3 / 4 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
+            if (UFO.prefs.getBoolean("playSounds")) {
+               UFO.prefs.putBoolean("playSounds", false);
+            }
+            else {
+               UFO.prefs.putBoolean("playSounds", true);
+            }
          }
          else if (touchPos.x > UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
             if (UFO.prefs.getBoolean("playMusic")) {
