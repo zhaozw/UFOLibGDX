@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "UFO";
 		cfg.useGL20 = false;
-		cfg.width = 800;
-		cfg.height = 480;
+		cfg.width = UFO.SCREEN_WIDTH;
+		cfg.height = UFO.SCREEN_HEIGHT;
 		
 		new LwjglApplication(new UFO(), cfg);
 	}

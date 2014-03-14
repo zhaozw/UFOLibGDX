@@ -6,6 +6,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class UFOMainMenuScreen implements Screen {
@@ -13,8 +14,6 @@ public class UFOMainMenuScreen implements Screen {
    final UFO game;
 
    OrthographicCamera camera;
-
-   Preferences gameplayPrefs;
    
 //   TextButton playGame = new TextButton("Play Game", skin);
 
@@ -22,20 +21,24 @@ public class UFOMainMenuScreen implements Screen {
       game = gam;
 
       camera = new OrthographicCamera();
-      camera.setToOrtho(false, 800, 480);
-
-      gameplayPrefs = Gdx.app.getPreferences("gameplay");
+      camera.setToOrtho(false, UFO.SCREEN_WIDTH, UFO.SCREEN_HEIGHT);
       
-      gameplayPrefs.putBoolean("playMusic", true);
-      gameplayPrefs.putBoolean("playSounds", true);
+      if (!UFO.prefs.contains("playMusic")) {
+         UFO.prefs.putBoolean("playMusic", true);
+      }
+      if (!UFO.prefs.contains("playSounds")) {
+         UFO.prefs.putBoolean("playSounds", true);
+      }
 
-      if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-         gameplayPrefs.putBoolean("useAccel", true);
+      if (!UFO.prefs.contains("useAccel")) {
+         if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
+            UFO.prefs.putBoolean("useAccel", true);
+         }
+         else {
+            UFO.prefs.putBoolean("useAccel", false);
+         }
       }
-      else {
-         gameplayPrefs.putBoolean("useAccel", false);
-      }
-      gameplayPrefs.flush();
+      UFO.prefs.flush();
    }
 
    @Override
@@ -49,14 +52,50 @@ public class UFOMainMenuScreen implements Screen {
 
       game.batch.begin();
       game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
-      game.font.draw(game.batch, "Tap anywhere to begin!", 100, 100);
-      game.batch.end();
-
-      if (Gdx.input.isTouched()) {
-         game.setScreen(new UFOGameScreen(game, gameplayPrefs));
-         dispose();
+      game.font.draw(game.batch, "Tap here to begin!", 100, 100);
+      if (UFO.prefs.getBoolean("playMusic")) {
+         game.font.draw(game.batch, "MUSIC IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
+      }
+      else {
+         game.font.draw(game.batch, "music is off", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
+      }
+      if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
+         if (UFO.prefs.getBoolean("useAccel")) {
+            game.font.draw(game.batch, "ACCEL IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4 * 3);
+         }
+         else {
+            game.font.draw(game.batch, "accel is off", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4 * 3);
+         }
       }
 
+      game.batch.end();
+
+      if (Gdx.input.justTouched()) {
+         Vector3 touchPos = new Vector3();
+         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
+         if (touchPos.x <= UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
+            game.setScreen(new UFOGameScreen(game));
+            dispose();
+         }
+         else if (touchPos.x > UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
+            if (UFO.prefs.getBoolean("playMusic")) {
+               UFO.prefs.putBoolean("playMusic", false);
+            }
+            else {
+               UFO.prefs.putBoolean("playMusic", true);
+            }
+         }
+         else if (touchPos.x > UFO.SCREEN_WIDTH / 2 && touchPos.y > UFO.SCREEN_HEIGHT / 2) {
+            if (UFO.prefs.getBoolean("useAccel")) {
+               UFO.prefs.putBoolean("useAccel", false);
+            }
+            else {
+               UFO.prefs.putBoolean("useAccel", true);
+            }
+         }
+      }
+      UFO.prefs.flush();
    }
 
    @Override
