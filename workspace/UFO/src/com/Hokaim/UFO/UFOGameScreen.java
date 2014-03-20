@@ -37,9 +37,11 @@ public class UFOGameScreen implements Screen {
    long lastDropTime;
    Sprite backgroundSprite;
    boolean isMoving = false;
+   boolean isPaused = false;
 
    public UFOGameScreen(final UFO gam) {
 	   this.game = gam;
+	   Gdx.input.setCatchBackKey(true);
 	   
       // load the images for the droplet and the bucket, 64x64 pixels each
       dropImage = new Texture(Gdx.files.internal("data/droplet.png"));
@@ -91,6 +93,33 @@ public class UFOGameScreen implements Screen {
 
    @Override
    public void render(float delta) {
+      if (isPaused) {
+         renderPause();
+      }
+      else {
+         renderGame();
+      }
+   }
+   
+   private void renderPause() {
+      camera.update();
+      game.batch.setProjectionMatrix(camera.combined);
+
+      game.batch.begin();
+      game.font.draw(game.batch, "PAUSED ", 100, 150);
+      game.font.draw(game.batch, "Tap here to resume!", 100, 100);
+
+      game.batch.end();
+      if (Gdx.input.justTouched()) {
+         isPaused = false;
+      }
+   }
+   
+   private void renderGame() {
+      
+      if (Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+         pause();
+      }
 
       // tell the camera to update its matrices.
       camera.update();
@@ -188,6 +217,10 @@ public class UFOGameScreen implements Screen {
 
    @Override
    public void pause() {
+//      Gdx.input.setCatchBackKey(false);
+//      game.setScreen(new UFOMainMenuScreen(game));
+//      dispose();
+      isPaused = true;
    }
 
    @Override
