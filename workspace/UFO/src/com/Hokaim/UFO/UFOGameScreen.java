@@ -102,6 +102,7 @@ public class UFOGameScreen implements Screen {
    }
    
    private void renderPause() {
+      renderScreen();
       camera.update();
       game.batch.setProjectionMatrix(camera.combined);
 
@@ -121,6 +122,14 @@ public class UFOGameScreen implements Screen {
          pause();
       }
 
+      renderScreen();
+      moveUFO();
+
+      moveRaindrops();
+   }
+   
+   private void renderScreen() {
+
       // tell the camera to update its matrices.
       camera.update();
 
@@ -138,8 +147,9 @@ public class UFOGameScreen implements Screen {
       }
       game.batch.end();
       
-      moveUFO();
-
+   }
+   
+   private void moveRaindrops() {
       // check if we need to create a new raindrop
       if (TimeUtils.nanoTime() - lastDropTime > 50000000) spawnRaindrop();
 

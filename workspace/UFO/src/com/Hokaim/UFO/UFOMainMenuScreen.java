@@ -51,7 +51,7 @@ public class UFOMainMenuScreen implements Screen {
       game.batch.setProjectionMatrix(camera.combined);
 
       game.batch.begin();
-      game.font.draw(game.batch, "Welcome to Drop!!! ", 100, 150);
+      game.font.draw(game.batch, "UFO Mania!!! ", 100, 150);
       game.font.draw(game.batch, "Tap here to begin!", 100, 100);
       if (UFO.prefs.getBoolean("playMusic")) {
          game.font.draw(game.batch, "MUSIC IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
