@@ -11,34 +11,34 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class UFOMainMenuScreen implements Screen {
    
-   final UFO game;
+   final UFOGameStart game;
 
    OrthographicCamera camera;
    
 //   TextButton playGame = new TextButton("Play Game", skin);
 
-   public UFOMainMenuScreen(final UFO gam) {
+   public UFOMainMenuScreen(final UFOGameStart gam) {
       game = gam;
 
       camera = new OrthographicCamera();
-      camera.setToOrtho(false, UFO.SCREEN_WIDTH, UFO.SCREEN_HEIGHT);
+      camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      if (!UFO.prefs.contains("playMusic")) {
-         UFO.prefs.putBoolean("playMusic", true);
+      if (!UFOGameStart.prefs.contains("playMusic")) {
+         UFOGameStart.prefs.putBoolean("playMusic", true);
       }
-      if (!UFO.prefs.contains("playSounds")) {
-         UFO.prefs.putBoolean("playSounds", true);
+      if (!UFOGameStart.prefs.contains("playSounds")) {
+         UFOGameStart.prefs.putBoolean("playSounds", true);
       }
 
-      if (!UFO.prefs.contains("useAccel")) {
+      if (!UFOGameStart.prefs.contains("useAccel")) {
          if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-            UFO.prefs.putBoolean("useAccel", true);
+            UFOGameStart.prefs.putBoolean("useAccel", true);
          }
          else {
-            UFO.prefs.putBoolean("useAccel", false);
+            UFOGameStart.prefs.putBoolean("useAccel", false);
          }
       }
-      UFO.prefs.flush();
+      UFOGameStart.prefs.flush();
    }
 
    @Override
@@ -53,24 +53,24 @@ public class UFOMainMenuScreen implements Screen {
       game.batch.begin();
       game.font.draw(game.batch, "UFO Mania!!! ", 100, 150);
       game.font.draw(game.batch, "Tap here to begin!", 100, 100);
-      if (UFO.prefs.getBoolean("playMusic")) {
-         game.font.draw(game.batch, "MUSIC IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
+      if (UFOGameStart.prefs.getBoolean("playMusic")) {
+         game.font.draw(game.batch, "MUSIC IS ON!", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4);
       }
       else {
-         game.font.draw(game.batch, "music is off", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4);
+         game.font.draw(game.batch, "music is off", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4);
       }
-      if (UFO.prefs.getBoolean("playSounds")) {
-         game.font.draw(game.batch, "SOUNDS ARE ON!", UFO.SCREEN_WIDTH * 3 / 4, UFO.SCREEN_HEIGHT / 4);
+      if (UFOGameStart.prefs.getBoolean("playSounds")) {
+         game.font.draw(game.batch, "SOUNDS ARE ON!", UFOGameStart.SCREEN_WIDTH * 3 / 4, UFOGameStart.SCREEN_HEIGHT / 4);
       }
       else {
-         game.font.draw(game.batch, "sounds are off", UFO.SCREEN_WIDTH * 3 / 4, UFO.SCREEN_HEIGHT / 4);
+         game.font.draw(game.batch, "sounds are off", UFOGameStart.SCREEN_WIDTH * 3 / 4, UFOGameStart.SCREEN_HEIGHT / 4);
       }
       if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-         if (UFO.prefs.getBoolean("useAccel")) {
-            game.font.draw(game.batch, "ACCEL IS ON!", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4 * 3);
+         if (UFOGameStart.prefs.getBoolean("useAccel")) {
+            game.font.draw(game.batch, "ACCEL IS ON!", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4 * 3);
          }
          else {
-            game.font.draw(game.batch, "accel is off", UFO.SCREEN_WIDTH / 2, UFO.SCREEN_HEIGHT / 4 * 3);
+            game.font.draw(game.batch, "accel is off", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4 * 3);
          }
       }
 
@@ -80,36 +80,36 @@ public class UFOMainMenuScreen implements Screen {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
          camera.unproject(touchPos);
-         if (touchPos.x <= UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
+         if (touchPos.x <= UFOGameStart.SCREEN_WIDTH / 2 && touchPos.y <= UFOGameStart.SCREEN_HEIGHT / 2) {
             game.setScreen(new UFOGameScreen(game));
             dispose();
          }
-         else if (touchPos.x > UFO.SCREEN_WIDTH * 3 / 4 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
-            if (UFO.prefs.getBoolean("playSounds")) {
-               UFO.prefs.putBoolean("playSounds", false);
+         else if (touchPos.x > UFOGameStart.SCREEN_WIDTH * 3 / 4 && touchPos.y <= UFOGameStart.SCREEN_HEIGHT / 2) {
+            if (UFOGameStart.prefs.getBoolean("playSounds")) {
+               UFOGameStart.prefs.putBoolean("playSounds", false);
             }
             else {
-               UFO.prefs.putBoolean("playSounds", true);
+               UFOGameStart.prefs.putBoolean("playSounds", true);
             }
          }
-         else if (touchPos.x > UFO.SCREEN_WIDTH / 2 && touchPos.y <= UFO.SCREEN_HEIGHT / 2) {
-            if (UFO.prefs.getBoolean("playMusic")) {
-               UFO.prefs.putBoolean("playMusic", false);
+         else if (touchPos.x > UFOGameStart.SCREEN_WIDTH / 2 && touchPos.y <= UFOGameStart.SCREEN_HEIGHT / 2) {
+            if (UFOGameStart.prefs.getBoolean("playMusic")) {
+               UFOGameStart.prefs.putBoolean("playMusic", false);
             }
             else {
-               UFO.prefs.putBoolean("playMusic", true);
+               UFOGameStart.prefs.putBoolean("playMusic", true);
             }
          }
-         else if (touchPos.x > UFO.SCREEN_WIDTH / 2 && touchPos.y > UFO.SCREEN_HEIGHT / 2) {
-            if (UFO.prefs.getBoolean("useAccel")) {
-               UFO.prefs.putBoolean("useAccel", false);
+         else if (touchPos.x > UFOGameStart.SCREEN_WIDTH / 2 && touchPos.y > UFOGameStart.SCREEN_HEIGHT / 2) {
+            if (UFOGameStart.prefs.getBoolean("useAccel")) {
+               UFOGameStart.prefs.putBoolean("useAccel", false);
             }
             else {
-               UFO.prefs.putBoolean("useAccel", true);
+               UFOGameStart.prefs.putBoolean("useAccel", true);
             }
          }
       }
-      UFO.prefs.flush();
+      UFOGameStart.prefs.flush();
    }
 
    @Override

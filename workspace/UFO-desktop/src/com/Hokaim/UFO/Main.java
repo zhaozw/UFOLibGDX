@@ -8,9 +8,9 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "UFO";
 		cfg.useGL20 = false;
-		cfg.width = UFO.SCREEN_WIDTH;
-		cfg.height = UFO.SCREEN_HEIGHT;
+		cfg.width = UFOGameStart.SCREEN_WIDTH;
+		cfg.height = UFOGameStart.SCREEN_HEIGHT;
 		
-		new LwjglApplication(new UFO(), cfg);
+		new LwjglApplication(new UFOGameStart(), cfg);
 	}
 }
