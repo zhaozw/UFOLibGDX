@@ -20,7 +20,7 @@ public class UFO {
    
    public UFO() {
       
-      UFOImage = new Texture(Gdx.files.internal("Textures/bucket.png"));
+      UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2 small.png"));
       shape = new Rectangle();
       shape.set(200, 200, UFO_WIDTH, UFO_HEIGHT);
    }

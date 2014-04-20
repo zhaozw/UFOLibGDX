@@ -2,12 +2,10 @@ package com.Hokaim.UFO;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 public class UFOMainMenuScreen implements Screen {
    
@@ -15,13 +13,17 @@ public class UFOMainMenuScreen implements Screen {
 
    OrthographicCamera camera;
    
-//   TextButton playGame = new TextButton("Play Game", skin);
-
+   Background background;
+   
    public UFOMainMenuScreen(final UFOGameStart gam) {
       game = gam;
+      
+      Gdx.input.setCatchBackKey(false);
 
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
+      
+      background = new Background("Textures/Spaceship Alpha 1.png", 512, 275);
       
       if (!UFOGameStart.prefs.contains("playMusic")) {
          UFOGameStart.prefs.putBoolean("playMusic", true);
@@ -43,14 +45,12 @@ public class UFOMainMenuScreen implements Screen {
 
    @Override
    public void render(float delta) {
-      
-      Gdx.gl.glClearColor(0, 0, 0.2f, 1);
-      Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
       camera.update();
       game.batch.setProjectionMatrix(camera.combined);
 
       game.batch.begin();
+      game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       game.font.draw(game.batch, "UFO Mania!!! ", 100, 150);
       game.font.draw(game.batch, "Tap here to begin!", 100, 100);
       if (UFOGameStart.prefs.getBoolean("playMusic")) {
