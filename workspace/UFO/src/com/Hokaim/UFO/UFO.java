@@ -3,6 +3,7 @@ package com.Hokaim.UFO;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
@@ -18,11 +19,16 @@ public class UFO {
    Texture UFOImage;
    Rectangle shape;
    
+   OrthographicCamera camera;
+   
    public UFO() {
       
       UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2 small.png"));
       shape = new Rectangle();
       shape.set(200, 200, UFO_WIDTH, UFO_HEIGHT);
+      
+      camera = new OrthographicCamera();
+      camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
    }
    
    public void moveUFO() {
@@ -35,8 +41,8 @@ public class UFO {
       
       if (Gdx.input.justTouched()) {
          Vector3 touchPos = new Vector3();
-         touchPos.set(Gdx.input.getX(), UFOGameStart.SCREEN_HEIGHT - Gdx.input.getY(), 0);
-//         camera.unproject(touchPos);
+         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
          if (touchPos.x >= shape.x - (UFO_WIDTH / 2) && touchPos.x <= shape.x + UFO_WIDTH * 3 / 2
                && touchPos.y >= shape.y - (UFO_HEIGHT / 2) && touchPos.y <= shape.y + UFO_HEIGHT * 3 / 2) {
             isMoving = true;
@@ -48,8 +54,8 @@ public class UFO {
       
       if (Gdx.input.isTouched() && isMoving) {
          Vector3 touchPos = new Vector3();
-         touchPos.set(Gdx.input.getX(), UFOGameStart.SCREEN_HEIGHT - Gdx.input.getY(), 0);
-//         camera.unproject(touchPos);
+         touchPos.set(Gdx.input.getX(),Gdx.input.getY(), 0);
+         camera.unproject(touchPos);
          shape.x = touchPos.x - UFO_WIDTH / 2;
          shape.y = touchPos.y - UFO_HEIGHT / 2;
       }
