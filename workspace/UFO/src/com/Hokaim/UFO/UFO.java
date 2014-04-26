@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -17,18 +18,36 @@ public class UFO {
    static boolean isMoving = false;
       
    Texture UFOImage;
+   Texture UFOImageTest;
    Rectangle shape;
+   Sprite UFOSprite;
+   float rotation; //Seems to be at 100 = 1/4 rotations per second 
    
    OrthographicCamera camera;
    
    public UFO() {
+      camera = new OrthographicCamera();
+      camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
+      UFOImageTest = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2.png"));
       UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2 small.png"));
+
       shape = new Rectangle();
       shape.set(200, 200, UFO_WIDTH, UFO_HEIGHT);
       
-      camera = new OrthographicCamera();
-      camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
+      UFOSprite = new Sprite(UFOImageTest);
+      UFOSprite.setSize(UFO_WIDTH, UFO_HEIGHT);
+      UFOSprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
+      UFOSprite.setRotation(0);
+      rotation = 1;
+
+   }
+   
+   /*
+    * updates the rotation depending on time and the set rotation coefficient
+    */
+   public void updateRotation() {
+      UFOSprite.rotate(rotation * 360 * Gdx.graphics.getDeltaTime());
    }
    
    public void moveUFO() {
@@ -70,10 +89,8 @@ public class UFO {
       if (shape.x > UFOGameStart.SCREEN_WIDTH - UFO_WIDTH) shape.x = UFOGameStart.SCREEN_WIDTH - UFO_WIDTH;
       if (shape.y < 0) shape.y = 0;
       if (shape.y > UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT) shape.y = UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT;
+      
+      UFOSprite.setX(shape.x);
+      UFOSprite.setY(shape.y);
    }
-
-   
-//   public void render() {
-//      game.batch.draw(bucketImage, bucket.x, bucket.y);
-//   }
 }

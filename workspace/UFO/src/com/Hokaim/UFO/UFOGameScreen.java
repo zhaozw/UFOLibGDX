@@ -112,8 +112,9 @@ public class UFOGameScreen implements Screen {
          pause();
       }
 
-      renderScreen();
+      UFO.updateRotation();
       UFO.moveUFO();
+      renderScreen();
 
       moveRaindrops();
    }
@@ -133,6 +134,7 @@ public class UFOGameScreen implements Screen {
       game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
       game.batch.draw(UFO.UFOImage, UFO.shape.x, UFO.shape.y);
+      UFO.UFOSprite.draw(game.batch);
 
       for (Rectangle raindrop: raindrops) {
          game.batch.draw(dropImage, raindrop.x, raindrop.y);
