@@ -24,6 +24,7 @@ public class UFOGameScreen implements Screen {
    Music gameMusic;
    OrthographicCamera camera;
    Array<Rectangle> raindrops;
+   Array<Projectile> projectiles;
    long lastDropTime;
    boolean isMoving = false;
    boolean isPaused = false;
@@ -57,6 +58,12 @@ public class UFOGameScreen implements Screen {
       // create the raindrops array and spawn the first raindrop
       raindrops = new Array<Rectangle>();
       spawnRaindrop();
+      
+      projectiles = new Array<Projectile>();
+      Projectile p = new Projectile(10, 10, 10, 10);
+      projectiles.add(p);
+      p = new Projectile(20, 10, 10, 0);
+      projectiles.add(p);
    }
 
    private void spawnRaindrop() {
@@ -139,6 +146,9 @@ public class UFOGameScreen implements Screen {
       for (Rectangle raindrop: raindrops) {
          game.batch.draw(dropImage, raindrop.x, raindrop.y);
       }
+      for (Projectile p: projectiles) {
+         p.sprite.draw(game.batch);
+      }
       game.font.draw(game.batch, "SCORE: " + score.toString(), UFOGameStart.SCREEN_WIDTH * 7 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
 
       game.batch.end();
@@ -162,6 +172,20 @@ public class UFOGameScreen implements Screen {
                dropSound.play();
             }
             iter.remove();
+         }
+      }
+      Iterator<Projectile> itr = projectiles.iterator();
+      while (itr.hasNext()) {
+         Projectile p = itr.next();
+         p.updateProjectile();
+         if (p.sprite.getX() + p.sprite.getWidth() < 0) itr.remove();
+         if (p.sprite.getY() + p.sprite.getHeight() < 0) itr.remove();
+         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
+            score++;
+            if (UFOGameStart.prefs.getBoolean("playSounds")) {
+               dropSound.play();
+            }
+            itr.remove();
          }
       }
    }

@@ -40,7 +40,6 @@ public class UFO {
       UFOSprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
       UFOSprite.setRotation(0);
       rotation = 1;
-
    }
    
    /*
