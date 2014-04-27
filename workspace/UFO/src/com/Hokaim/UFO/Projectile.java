@@ -19,6 +19,7 @@ public class Projectile {
    Sprite sprite;
    float rotation;
    Vector2 direction;
+   Vector2 acceleration;
 
    public Projectile() {
       image = new Texture(Gdx.files.internal("Textures/droplet.png"));
@@ -35,12 +36,16 @@ public class Projectile {
       sprite.setPosition(x, y);
       sprite.setOrigin(PROJECTILE_WIDTH / 2, PROJECTILE_HEIGHT / 2);
       direction = new Vector2(velX, velY);
+      acceleration = new Vector2(0, 0);
       sprite.setRotation((direction.angle() + 90) % 360);
    }
    
    public void updateProjectile() {
       sprite.setX(sprite.getX() + (direction.x * Gdx.graphics.getDeltaTime()));
       sprite.setY(sprite.getY() + (direction.y * Gdx.graphics.getDeltaTime()));
+      direction.x += acceleration.x * Gdx.graphics.getDeltaTime();
+      direction.y += acceleration.y * Gdx.graphics.getDeltaTime();
+      sprite.setRotation((direction.angle() + 90) % 360);
    }
 
 }

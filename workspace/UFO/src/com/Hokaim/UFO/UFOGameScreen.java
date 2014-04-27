@@ -19,17 +19,14 @@ public class UFOGameScreen implements Screen {
 
 	final UFOGameStart game;
 	
-   Texture dropImage;
    Sound dropSound;
    Music gameMusic;
    OrthographicCamera camera;
-   Array<Rectangle> raindrops;
    Array<Projectile> projectiles;
    long lastDropTime;
    boolean isMoving = false;
    boolean isPaused = false;
    Integer score;
-   
    UFO UFO;
    Background background;
 
@@ -41,9 +38,6 @@ public class UFOGameScreen implements Screen {
 	   background = new Background();
 	   score = new Integer(0);
 	   
-      // load the images for the droplet and the bucket, 64x64 pixels each
-      dropImage = new Texture(Gdx.files.internal("Textures/droplet.png"));
-
       // load the drop sound effect and the rain background "music"
       dropSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/smb3_coin.wav"));
       gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/Robert Miles - Children.mp3"));
@@ -54,25 +48,26 @@ public class UFOGameScreen implements Screen {
       // create the camera and the SpriteBatch
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
-
-      // create the raindrops array and spawn the first raindrop
-      raindrops = new Array<Rectangle>();
-      spawnRaindrop();
       
       projectiles = new Array<Projectile>();
       Projectile p = new Projectile(10, 10, 10, 10);
       projectiles.add(p);
       p = new Projectile(20, 10, 10, 0);
       projectiles.add(p);
+      
+      spawnProjectile();
    }
 
-   private void spawnRaindrop() {
-      Rectangle raindrop = new Rectangle();
-      raindrop.x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - 64);
-      raindrop.y = UFOGameStart.SCREEN_HEIGHT;
-      raindrop.width = 64;
-      raindrop.height = 64;
-      raindrops.add(raindrop);
+   private void spawnProjectile() {
+      //TODO: Clean this function up, may want to consider multiple sizes for projectile?
+      float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - Projectile.PROJECTILE_WIDTH);
+      float velX = MathUtils.random(-10, 10);
+            
+      Projectile p = new Projectile(x, UFOGameStart.SCREEN_HEIGHT, velX, -200);
+      p.acceleration.x = MathUtils.random() * 50;
+      
+      projectiles.add(p);
+      
       lastDropTime = TimeUtils.nanoTime();
    }
 
@@ -95,7 +90,6 @@ public class UFOGameScreen implements Screen {
       game.font.draw(game.batch, "PAUSED ", 100, 150);
       game.font.draw(game.batch, "Tap here to resume!", 100, 100);
       game.font.draw(game.batch, "Tap here for main menu", UFOGameStart.SCREEN_WIDTH * 3 / 4, UFOGameStart.SCREEN_HEIGHT / 4);
-
 
       game.batch.end();
 
@@ -121,9 +115,8 @@ public class UFOGameScreen implements Screen {
 
       UFO.updateRotation();
       UFO.moveUFO();
+      moveProjectiles();
       renderScreen();
-
-      moveRaindrops();
    }
    
    private void renderScreen() {
@@ -140,12 +133,8 @@ public class UFOGameScreen implements Screen {
       game.batch.begin();
       game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      game.batch.draw(UFO.UFOImage, UFO.shape.x, UFO.shape.y);
       UFO.UFOSprite.draw(game.batch);
 
-      for (Rectangle raindrop: raindrops) {
-         game.batch.draw(dropImage, raindrop.x, raindrop.y);
-      }
       for (Projectile p: projectiles) {
          p.sprite.draw(game.batch);
       }
@@ -154,19 +143,20 @@ public class UFOGameScreen implements Screen {
       game.batch.end();
    }
    
-   private void moveRaindrops() {
+   private void moveProjectiles() {
       // check if we need to create a new raindrop
-      if (TimeUtils.nanoTime() - lastDropTime > 50000000) spawnRaindrop();
+      if (TimeUtils.nanoTime() - lastDropTime > 250000000) spawnProjectile();
 
-      // move the raindrops, remove any that are beneath the bottom edge of
-      // the screen or that hit the bucket. In the later case we play back
+      // move the projectiles, remove any that are beneath the bottom edge of
+      // the screen or that hit the ufo. In the later case we play back
       // a sound effect as well.
-      Iterator<Rectangle> iter = raindrops.iterator();
+      Iterator<Projectile> iter = projectiles.iterator();
       while (iter.hasNext()) {
-         Rectangle raindrop = iter.next();
-         raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-         if (raindrop.y + 64 < 0) iter.remove();
-         if (raindrop.overlaps(UFO.shape)) {
+         Projectile p = iter.next();
+         p.updateProjectile();
+         if (p.sprite.getX() + p.sprite.getWidth() < 0) iter.remove();
+         if (p.sprite.getY() + p.sprite.getHeight() < 0) iter.remove();
+         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
                dropSound.play();
@@ -174,26 +164,11 @@ public class UFOGameScreen implements Screen {
             iter.remove();
          }
       }
-      Iterator<Projectile> itr = projectiles.iterator();
-      while (itr.hasNext()) {
-         Projectile p = itr.next();
-         p.updateProjectile();
-         if (p.sprite.getX() + p.sprite.getWidth() < 0) itr.remove();
-         if (p.sprite.getY() + p.sprite.getHeight() < 0) itr.remove();
-         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
-            score++;
-            if (UFOGameStart.prefs.getBoolean("playSounds")) {
-               dropSound.play();
-            }
-            itr.remove();
-         }
-      }
    }
 
    @Override
    public void dispose() {
       // dispose of all the native resources
-      dropImage.dispose();
       dropSound.dispose();
       gameMusic.dispose();
    }
@@ -216,8 +191,7 @@ public class UFOGameScreen implements Screen {
 
    @Override
    public void show() {
-	   // start the playback of the background music
-	   // when the screen is shown
+	   // start the playback of the background music when the screen is shown
       if (UFOGameStart.prefs.getBoolean("playMusic")) {
          gameMusic.play();
       }
