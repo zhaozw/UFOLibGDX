@@ -6,7 +6,8 @@ import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Ellipse;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
@@ -20,6 +21,7 @@ public class UFO {
    Texture UFOImage;
    Texture UFOImageTest;
    Rectangle shape;
+   Circle test;
    Sprite UFOSprite;
    float rotation; //Seems to be at 100 = 1/4 rotations per second 
    
@@ -34,6 +36,9 @@ public class UFO {
 
       shape = new Rectangle();
       shape.set(200, 200, UFO_WIDTH, UFO_HEIGHT);
+      
+      test = new Circle();
+      test.setRadius(UFO_WIDTH / 2);
       
       UFOSprite = new Sprite(UFOImageTest);
       UFOSprite.setSize(UFO_WIDTH, UFO_HEIGHT);
@@ -84,12 +89,31 @@ public class UFO {
       if (Gdx.input.isKeyPressed(Keys.UP)) shape.y += 200 * Gdx.graphics.getDeltaTime();
 
       // make sure the bucket stays within the screen bounds
-      if (shape.x < 0) shape.x = 0;
+      if (shape.x < 0) shape.x = 0; //left bounds
       if (shape.x > UFOGameStart.SCREEN_WIDTH - UFO_WIDTH) shape.x = UFOGameStart.SCREEN_WIDTH - UFO_WIDTH;
-      if (shape.y < 0) shape.y = 0;
+      if (shape.y < 0) shape.y = 0; //bottom bounds
       if (shape.y > UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT) shape.y = UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT;
       
       UFOSprite.setX(shape.x);
       UFOSprite.setY(shape.y);
+      test.setPosition(shape.x + (UFO_WIDTH / 2), shape.y + (UFO_HEIGHT / 2));
+   }
+   
+   public boolean collides(Circle circle) {
+      return test.overlaps(circle);
+   }
+   
+   public boolean collides(Rectangle rectangle) {
+
+      if (Intersector.overlaps(test, rectangle)) {
+         return true;
+      }
+//      if (test.contains(rectangle.x, rectangle.y)
+//            || test.contains(rectangle.x + rectangle.width, rectangle.y)
+//            || test.contains(rectangle.x, rectangle.y + rectangle.height)
+//            || test.contains(rectangle.x + rectangle.width, rectangle.y + rectangle.height)) {
+//         return true;
+//      }
+      return false;
    }
 }

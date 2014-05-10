@@ -156,7 +156,10 @@ public class UFOGameScreen implements Screen {
          p.updateProjectile();
          if (p.sprite.getX() + p.sprite.getWidth() < 0) iter.remove();
          if (p.sprite.getY() + p.sprite.getHeight() < 0) iter.remove();
-         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
+//         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
+//         if (UFO.collides(p.sprite.getBoundingRectangle())) {
+         if (UFO.collides(p.shape)) {
+            
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
                dropSound.play();
