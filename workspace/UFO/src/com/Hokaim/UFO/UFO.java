@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class UFO {
@@ -19,10 +20,9 @@ public class UFO {
    static boolean isMoving = false;
       
    Texture UFOImage;
-   Texture UFOImageTest;
-   Rectangle shape;
-   Circle test;
-   Sprite UFOSprite;
+   Vector2 location;
+   Circle shape;
+   Sprite sprite;
    float rotation; //Seems to be at 100 = 1/4 rotations per second 
    
    OrthographicCamera camera;
@@ -31,43 +31,39 @@ public class UFO {
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      UFOImageTest = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2.png"));
-      UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2 small.png"));
+      UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2.png"));
 
-      shape = new Rectangle();
-      shape.set(200, 200, UFO_WIDTH, UFO_HEIGHT);
+      location = new Vector2(200, 200);
       
-      test = new Circle();
-      test.setRadius(UFO_WIDTH / 2);
+      shape = new Circle();
+      shape.setRadius(UFO_WIDTH / 2);
       
-      UFOSprite = new Sprite(UFOImageTest);
-      UFOSprite.setSize(UFO_WIDTH, UFO_HEIGHT);
-      UFOSprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
-      UFOSprite.setRotation(0);
+      sprite = new Sprite(UFOImage);
+      sprite.setSize(UFO_WIDTH, UFO_HEIGHT);
+      sprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
+      sprite.setRotation(0);
       rotation = 1;
    }
    
-   /*
-    * updates the rotation depending on time and the set rotation coefficient
-    */
+   // updates the rotation depending on current position, time and the set rotation coefficient
    public void updateRotation() {
-      UFOSprite.rotate(rotation * 360 * Gdx.graphics.getDeltaTime());
+      sprite.rotate(rotation * 360 * Gdx.graphics.getDeltaTime());
    }
    
    public void moveUFO() {
-      // process user input
-      //TODO: will be a isAccelOn flag later
+      // Process accelerometer input
       if (UFOGameStart.prefs.getBoolean("useAccel") && Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-          shape.x = Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2;
-          shape.y = Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2;
+          location.x = Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2;
+          location.y = Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2;
        }
       
+      // Process touchscreen input
       if (Gdx.input.justTouched()) {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
          camera.unproject(touchPos);
-         if (touchPos.x >= shape.x - (UFO_WIDTH / 2) && touchPos.x <= shape.x + UFO_WIDTH * 3 / 2
-               && touchPos.y >= shape.y - (UFO_HEIGHT / 2) && touchPos.y <= shape.y + UFO_HEIGHT * 3 / 2) {
+         if (touchPos.x >= location.x - (UFO_WIDTH / 2) && touchPos.x <= location.x + UFO_WIDTH * 3 / 2
+               && touchPos.y >= location.y - (UFO_HEIGHT / 2) && touchPos.y <= location.y + UFO_HEIGHT * 3 / 2) {
             isMoving = true;
          }
          else {
@@ -79,41 +75,36 @@ public class UFO {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(),Gdx.input.getY(), 0);
          camera.unproject(touchPos);
-         shape.x = touchPos.x - UFO_WIDTH / 2;
-         shape.y = touchPos.y - UFO_HEIGHT / 2;
+         location.x = touchPos.x - UFO_WIDTH / 2;
+         location.y = touchPos.y - UFO_HEIGHT / 2;
       }
 
-      if (Gdx.input.isKeyPressed(Keys.LEFT)) shape.x -= 200 * Gdx.graphics.getDeltaTime();
-      if (Gdx.input.isKeyPressed(Keys.RIGHT)) shape.x += 200 * Gdx.graphics.getDeltaTime();
-      if (Gdx.input.isKeyPressed(Keys.DOWN)) shape.y -= 200 * Gdx.graphics.getDeltaTime();
-      if (Gdx.input.isKeyPressed(Keys.UP)) shape.y += 200 * Gdx.graphics.getDeltaTime();
+      //Keyboard input movement
+      if (Gdx.input.isKeyPressed(Keys.LEFT))  location.x -= 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.RIGHT)) location.x += 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.DOWN))  location.y -= 200 * Gdx.graphics.getDeltaTime();
+      if (Gdx.input.isKeyPressed(Keys.UP))    location.y += 200 * Gdx.graphics.getDeltaTime();
 
       // make sure the bucket stays within the screen bounds
-      if (shape.x < 0) shape.x = 0; //left bounds
-      if (shape.x > UFOGameStart.SCREEN_WIDTH - UFO_WIDTH) shape.x = UFOGameStart.SCREEN_WIDTH - UFO_WIDTH;
-      if (shape.y < 0) shape.y = 0; //bottom bounds
-      if (shape.y > UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT) shape.y = UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT;
+      if (location.x < 0) location.x = 0; //left bounds
+      if (location.x > UFOGameStart.SCREEN_WIDTH - UFO_WIDTH) location.x = UFOGameStart.SCREEN_WIDTH - UFO_WIDTH;
+      if (location.y < 0) location.y = 0; //bottom bounds
+      if (location.y > UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT) location.y = UFOGameStart.SCREEN_HEIGHT - UFO_HEIGHT;
       
-      UFOSprite.setX(shape.x);
-      UFOSprite.setY(shape.y);
-      test.setPosition(shape.x + (UFO_WIDTH / 2), shape.y + (UFO_HEIGHT / 2));
+      //Set Sprite and shape location based on location
+      //TODO: can replace location with just sprite for calculations in future
+      sprite.setX(location.x);
+      sprite.setY(location.y);
+      shape.setPosition(location.x + (UFO_WIDTH / 2), location.y + (UFO_HEIGHT / 2));
    }
    
+   // Uses collision libraries to determine collision for circles
    public boolean collides(Circle circle) {
-      return test.overlaps(circle);
+      return Intersector.overlaps(shape, circle);
    }
    
+   // Uses collision libraries to determine collision for rectangles
    public boolean collides(Rectangle rectangle) {
-
-      if (Intersector.overlaps(test, rectangle)) {
-         return true;
-      }
-//      if (test.contains(rectangle.x, rectangle.y)
-//            || test.contains(rectangle.x + rectangle.width, rectangle.y)
-//            || test.contains(rectangle.x, rectangle.y + rectangle.height)
-//            || test.contains(rectangle.x + rectangle.width, rectangle.y + rectangle.height)) {
-//         return true;
-//      }
-      return false;
+      return Intersector.overlaps(shape, rectangle);
    }
 }

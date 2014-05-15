@@ -8,9 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -26,7 +24,7 @@ public class UFOGameScreen implements Screen {
    long lastDropTime;
    boolean isMoving = false;
    boolean isPaused = false;
-   Integer score;
+   int score;
    UFO UFO;
    Background background;
 
@@ -50,10 +48,6 @@ public class UFOGameScreen implements Screen {
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
       projectiles = new Array<Projectile>();
-      Projectile p = new Projectile(10, 10, 10, 10);
-      projectiles.add(p);
-      p = new Projectile(20, 10, 10, 0);
-      projectiles.add(p);
       
       spawnProjectile();
    }
@@ -109,9 +103,8 @@ public class UFOGameScreen implements Screen {
    
    private void renderGame() {
       
-      if (Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+      if (Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE))
          pause();
-      }
 
       UFO.updateRotation();
       UFO.moveUFO();
@@ -133,13 +126,15 @@ public class UFOGameScreen implements Screen {
       game.batch.begin();
       game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      UFO.UFOSprite.draw(game.batch);
+      UFO.sprite.draw(game.batch);
 
       for (Projectile p: projectiles) {
          p.sprite.draw(game.batch);
       }
-      game.font.draw(game.batch, "SCORE: " + score.toString(), UFOGameStart.SCREEN_WIDTH * 7 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
+      game.font.draw(game.batch, "SCORE: " + score, UFOGameStart.SCREEN_WIDTH * 7 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
 
+      game.font.draw(game.batch, "numProjectiles: " + projectiles.size, UFOGameStart.SCREEN_WIDTH * 1 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
+      
       game.batch.end();
    }
    
@@ -155,10 +150,11 @@ public class UFOGameScreen implements Screen {
          Projectile p = iter.next();
          p.updateProjectile();
          if (p.sprite.getX() + p.sprite.getWidth() < 0) iter.remove();
-         if (p.sprite.getY() + p.sprite.getHeight() < 0) iter.remove();
+         else if (p.sprite.getX() > UFOGameStart.SCREEN_WIDTH) iter.remove();
+         else if (p.sprite.getY() + p.sprite.getHeight() < 0) iter.remove();
 //         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
 //         if (UFO.collides(p.sprite.getBoundingRectangle())) {
-         if (UFO.collides(p.shape)) {
+         else if (UFO.collides(p.shape)) {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
