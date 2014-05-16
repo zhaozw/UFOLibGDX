@@ -34,7 +34,6 @@ public class UFOGameScreen implements Screen {
 	   
 	   UFO = new UFO();
 	   background = new Background();
-	   score = new Integer(0);
 	   
       // load the drop sound effect and the rain background "music"
       dropSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/smb3_coin.wav"));
@@ -102,7 +101,6 @@ public class UFOGameScreen implements Screen {
    }
    
    private void renderGame() {
-      
       if (Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE))
          pause();
 
@@ -113,7 +111,6 @@ public class UFOGameScreen implements Screen {
    }
    
    private void renderScreen() {
-
       // tell the camera to update its matrices.
       camera.update();
 

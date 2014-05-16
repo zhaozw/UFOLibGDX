@@ -47,18 +47,19 @@ public class Projectile {
    }
    
    public void updateProjectile() {
-//      acceleration.x = Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2;
-//      acceleration.y = Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2;
-
       //trying to figure out which method of accel. movement i like better
       //i think ill use the true version, allows me to preset accelerations
-      if (true) {
-         acceleration.x += Gdx.input.getAccelerometerY() * 1;
-         acceleration.y += Gdx.input.getAccelerometerX() * -1;
-      }
-      else {
-         acceleration.x = Gdx.input.getAccelerometerY() * 30;
-         acceleration.y = Gdx.input.getAccelerometerX() * -30;
+      //can use a coefficient to make acceleration faster or slower for certain projectiles
+      //TODO:
+      if (UFOGameStart.prefs.getBoolean("useAccel")) {
+         if (false) {
+            acceleration.x += Gdx.input.getAccelerometerY() * 1;
+            acceleration.y += Gdx.input.getAccelerometerX() * -1;
+         }
+         else {
+            acceleration.x = Gdx.input.getAccelerometerY() * 50;
+            acceleration.y = Gdx.input.getAccelerometerX() * -50;
+         }
       }
       
       direction.x += acceleration.x * Gdx.graphics.getDeltaTime();

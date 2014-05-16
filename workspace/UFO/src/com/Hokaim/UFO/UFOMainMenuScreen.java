@@ -23,24 +23,7 @@ public class UFOMainMenuScreen implements Screen {
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      background = new Background("Textures/Spaceship Alpha 1.png", 512, 275);
-      
-      if (!UFOGameStart.prefs.contains("playMusic")) {
-         UFOGameStart.prefs.putBoolean("playMusic", true);
-      }
-      if (!UFOGameStart.prefs.contains("playSounds")) {
-         UFOGameStart.prefs.putBoolean("playSounds", true);
-      }
-
-      if (!UFOGameStart.prefs.contains("useAccel")) {
-         if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-            UFOGameStart.prefs.putBoolean("useAccel", true);
-         }
-         else {
-            UFOGameStart.prefs.putBoolean("useAccel", false);
-         }
-      }
-      UFOGameStart.prefs.flush();
+      background = new Background("Textures/Spaceship Alpha 1.png", 512, 275);  
    }
 
    @Override
@@ -53,29 +36,29 @@ public class UFOMainMenuScreen implements Screen {
       game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       game.font.draw(game.batch, "UFO Mania!!! ", 100, 150);
       game.font.draw(game.batch, "Tap here to begin!", 100, 100);
-      if (UFOGameStart.prefs.getBoolean("playMusic")) {
+      if (UFOGameStart.prefs.getBoolean("playMusic"))
          game.font.draw(game.batch, "MUSIC IS ON!", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4);
-      }
-      else {
+      else
          game.font.draw(game.batch, "music is off", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4);
-      }
-      if (UFOGameStart.prefs.getBoolean("playSounds")) {
+
+      if (UFOGameStart.prefs.getBoolean("playSounds"))
          game.font.draw(game.batch, "SOUNDS ARE ON!", UFOGameStart.SCREEN_WIDTH * 3 / 4, UFOGameStart.SCREEN_HEIGHT / 4);
-      }
-      else {
+      else
          game.font.draw(game.batch, "sounds are off", UFOGameStart.SCREEN_WIDTH * 3 / 4, UFOGameStart.SCREEN_HEIGHT / 4);
-      }
+
       if (Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-         if (UFOGameStart.prefs.getBoolean("useAccel")) {
+         if (UFOGameStart.prefs.getBoolean("useAccel"))
             game.font.draw(game.batch, "ACCEL IS ON!", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4 * 3);
-         }
-         else {
+         else
             game.font.draw(game.batch, "accel is off", UFOGameStart.SCREEN_WIDTH / 2, UFOGameStart.SCREEN_HEIGHT / 4 * 3);
-         }
       }
 
       game.batch.end();
 
+      updatePrefs();
+   }
+   
+   private void updatePrefs() {
       if (Gdx.input.justTouched()) {
          Vector3 touchPos = new Vector3();
          touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -139,6 +122,6 @@ public class UFOMainMenuScreen implements Screen {
 
    @Override
    public void dispose() {
-
+      
    }
 }

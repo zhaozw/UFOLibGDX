@@ -20,7 +20,6 @@ public class UFO {
    static boolean isMoving = false;
       
    Texture UFOImage;
-   Vector2 location;
    Circle shape;
    Sprite sprite;
    float rotation; //Seems to be at 100 = 1/4 rotations per second 
@@ -32,8 +31,6 @@ public class UFO {
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
       UFOImage = new Texture(Gdx.files.internal("Textures/Spaceship Alpha 2.png"));
-
-      location = new Vector2(200, 200);
       
       shape = new Circle();
       shape.setRadius(UFO_WIDTH / 2);
@@ -42,6 +39,7 @@ public class UFO {
       sprite.setSize(UFO_WIDTH, UFO_HEIGHT);
       sprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
       sprite.setRotation(0);
+      sprite.setPosition(UFOGameStart.SCREEN_WIDTH / 2 - UFO_WIDTH / 2, 100);
       rotation = 1;
    }
    
@@ -51,10 +49,13 @@ public class UFO {
    }
    
    public void moveUFO() {
+      Vector2 location = new Vector2(sprite.getX(), sprite.getY());
+      
       // Process accelerometer input
+      //TODO: did some accel smoothing, but may need more 
       if (UFOGameStart.prefs.getBoolean("useAccel") && Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-          location.x = Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2;
-          location.y = Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2;
+          location.x = ((Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2) + location.x) / 2;
+          location.y = ((Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2) + location.y) / 2;
        }
       
       // Process touchscreen input
