@@ -18,6 +18,9 @@ public class Projectile {
    Vector2 direction;
    Vector2 acceleration;
    
+   boolean isGravity;
+   int gravity;
+   
    public Projectile() {
       image = new Texture(Gdx.files.internal("Textures/droplet.png"));
       
@@ -28,6 +31,9 @@ public class Projectile {
       
       shape = new Circle();
       shape.setRadius((PROJECTILE_WIDTH + PROJECTILE_HEIGHT) / 4);
+      
+      isGravity = true;
+      gravity = 50;
    }
    
    public Projectile(float x, float y, float velX, float velY) {
@@ -44,21 +50,23 @@ public class Projectile {
       
       shape = new Circle();
       shape.setRadius((PROJECTILE_WIDTH + PROJECTILE_HEIGHT) / 4);
+      
+      isGravity = true;
+      gravity = 50;
    }
    
    public void updateProjectile() {
       //trying to figure out which method of accel. movement i like better
-      //i think ill use the true version, allows me to preset accelerations
-      //can use a coefficient to make acceleration faster or slower for certain projectiles
-      //TODO:
-      if (UFOGameStart.prefs.getBoolean("useAccel")) {
+      //i think ill use the false version, makes more sense
+      //TODO: Test and clean up unneeded portion
+      if (isGravity && UFOGameStart.prefs.getBoolean("useAccel")) {
          if (false) {
             acceleration.x += Gdx.input.getAccelerometerY() * 1;
             acceleration.y += Gdx.input.getAccelerometerX() * -1;
          }
          else {
-            acceleration.x = Gdx.input.getAccelerometerY() * 50;
-            acceleration.y = Gdx.input.getAccelerometerX() * -50;
+            acceleration.x = Gdx.input.getAccelerometerY() * gravity;
+            acceleration.y = Gdx.input.getAccelerometerX() * -gravity;
          }
       }
       

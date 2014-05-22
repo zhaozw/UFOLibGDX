@@ -32,7 +32,7 @@ public class UFOGameScreen implements Screen {
 	   this.game = gam;
 	   Gdx.input.setCatchBackKey(true);
 	   
-	   UFO = new UFO();
+	   UFO = new UFO("Textures/Spaceship Alpha 2.png");
 	   background = new Background();
 	   
       // load the drop sound effect and the rain background "music"

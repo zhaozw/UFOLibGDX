@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Background {
    
    Texture backgroundImage;
-   Sprite backgroundSprite;
    TextureRegion backgroundRegion;
+   Sprite backgroundSprite;
 
    public Background() {
       
