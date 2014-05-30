@@ -17,7 +17,7 @@ public class UFO {
    public static final int UFO_WIDTH = 64;
    public static final int UFO_HEIGHT = 64;
    
-   private static final int ACCEL_SMOOTH = 4;   // Poss. values, 0 and up, 0 = no smoothing, 3-5 is good range
+   public static final int ACCEL_SMOOTH = 4;   // Poss. values, 0 and up, 0 = no smoothing, 3-5 is good range
                                                 // Can also use to make slower ships, try 10
    
    static boolean isMoving = false;
@@ -25,7 +25,7 @@ public class UFO {
    Texture UFOImage;
    Circle shape;
    Sprite sprite;
-   float rotation; //Seems to be at 100 = 1/4 rotations per second 
+   float rotation;
    
    OrthographicCamera camera;
    
@@ -43,12 +43,12 @@ public class UFO {
       sprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
       sprite.setRotation(0);
       sprite.setPosition(UFOGameStart.SCREEN_WIDTH / 2 - UFO_WIDTH / 2, 100);
-      rotation = 1;
+      rotation = 360;
    }
    
    // updates the rotation depending on current position, time and the set rotation coefficient
    public void updateRotation() {
-      sprite.rotate(rotation * 360 * Gdx.graphics.getDeltaTime());
+      sprite.rotate(rotation * Gdx.graphics.getDeltaTime());
    }
    
    public void moveUFO() {
@@ -58,8 +58,11 @@ public class UFO {
       //TODO: have other people help determine best ACCEL_SMOOTH value for good balance of speed and smoothness
       //TODO: also may want to determine if this is the best way for smoothing
       if (UFOGameStart.prefs.getBoolean("useAccel") && Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer)) {
-          location.x = ((Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH / 10 + UFOGameStart.SCREEN_WIDTH / 2) + location.x * ACCEL_SMOOTH) / (ACCEL_SMOOTH + 1);
-          location.y = ((Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / 10 * -1 + UFOGameStart.SCREEN_HEIGHT / 2) + location.y * ACCEL_SMOOTH) / (ACCEL_SMOOTH + 1);
+          location.x = ((Gdx.input.getAccelerometerY() * UFOGameStart.SCREEN_WIDTH  /  10 + UFOGameStart.SCREEN_WIDTH  / 2) + location.x * ACCEL_SMOOTH) / (ACCEL_SMOOTH + 1);
+          location.y = ((Gdx.input.getAccelerometerX() * UFOGameStart.SCREEN_HEIGHT / -10 + UFOGameStart.SCREEN_HEIGHT / 2) + location.y * ACCEL_SMOOTH) / (ACCEL_SMOOTH + 1);
+          //Center the UFO
+          location.x -= (UFO_WIDTH  / 10);
+          location.y -= (UFO_HEIGHT / 10);
       }
       
       // Process touchscreen input
