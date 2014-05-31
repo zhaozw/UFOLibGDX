@@ -49,14 +49,25 @@ public class UFOGameScreen implements Screen {
       projectiles = new Array<Projectile>();
       
       spawnProjectile();
+      
+      //TODO: remove later
+      float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - ProjDrop.PROJECTILE_WIDTH);
+      float velX = MathUtils.random(-10, 10);
+            
+      ProjBucket p = new ProjBucket(x, UFOGameStart.SCREEN_HEIGHT, velX, -200);
+      p.acceleration.x = MathUtils.random() * 50;
+      
+      projectiles.add(p);
+      
+      
    }
 
    private void spawnProjectile() {
       //TODO: Clean this function up, may want to consider multiple sizes for projectile?
-      float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - Projectile.PROJECTILE_WIDTH);
+      float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - ProjDrop.PROJECTILE_WIDTH);
       float velX = MathUtils.random(-10, 10);
             
-      Projectile p = new Projectile(x, UFOGameStart.SCREEN_HEIGHT, velX, -200);
+      ProjDrop p = new ProjDrop(x, UFOGameStart.SCREEN_HEIGHT, velX, -200);
       p.acceleration.x = MathUtils.random() * 50;
       
       projectiles.add(p);
@@ -126,7 +137,7 @@ public class UFOGameScreen implements Screen {
       UFO.sprite.draw(game.batch);
 
       for (Projectile p: projectiles) {
-         p.sprite.draw(game.batch);
+         p.draw(game.batch);
       }
       game.font.draw(game.batch, "SCORE: " + score, UFOGameStart.SCREEN_WIDTH * 7 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
 
@@ -146,12 +157,13 @@ public class UFOGameScreen implements Screen {
       while (iter.hasNext()) {
          Projectile p = iter.next();
          p.updateProjectile();
-         if (p.sprite.getX() + p.sprite.getWidth() < 0) iter.remove();
-         else if (p.sprite.getX() > UFOGameStart.SCREEN_WIDTH) iter.remove();
-         else if (p.sprite.getY() + p.sprite.getHeight() < 0) iter.remove();
+         if (p.getX() + p.getWidth() < 0) iter.remove();
+         else if (p.getX() > UFOGameStart.SCREEN_WIDTH) iter.remove();
+         else if (p.getY() + p.getHeight() < 0) iter.remove();
 //         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
 //         if (UFO.collides(p.sprite.getBoundingRectangle())) {
-         else if (UFO.collides(p.shape)) {
+//         else if (UFO.collides(p.shape)) {
+         else if (p.collides(UFO.shape)) {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
