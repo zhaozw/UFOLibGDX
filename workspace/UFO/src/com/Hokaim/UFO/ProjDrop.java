@@ -68,7 +68,7 @@ public class ProjDrop implements Projectile {
    }
    
    public void updateRotation() {
-      sprite.setRotation((direction.angle() + 90) % 360);
+      sprite.setRotation(direction.angle());
    }
    
    public void draw(SpriteBatch batch) {
