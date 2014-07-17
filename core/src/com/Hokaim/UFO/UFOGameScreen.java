@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class UFOGameScreen implements Screen {
-
+//TODO: NOTE: Can probably make an abstract class for game screens, help to standardize flow
 	final UFOGameStart game;
 	
    Sound dropSound;
@@ -22,7 +22,6 @@ public class UFOGameScreen implements Screen {
    OrthographicCamera camera;
    Array<Projectile> projectiles;
    long lastDropTime;
-   boolean isMoving = false;
    boolean isPaused = false;
    int score;
    UFO UFO;
@@ -167,7 +166,7 @@ public class UFOGameScreen implements Screen {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
-               Gdx.input.vibrate(100);
+               Gdx.input.vibrate(75);
                dropSound.play();
             }
             iter.remove();
