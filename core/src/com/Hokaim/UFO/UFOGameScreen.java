@@ -167,6 +167,7 @@ public class UFOGameScreen implements Screen {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
+               Gdx.input.vibrate(100);
                dropSound.play();
             }
             iter.remove();
