@@ -21,7 +21,7 @@ public class ProjDrop implements Projectile {
    Vector2 acceleration;
    
    boolean isGravity = true;
-   int gravity = 50;
+   int gravity = 100;
    
    public ProjDrop() {
       image = new Texture(Gdx.files.internal("Textures/droplet.png"));

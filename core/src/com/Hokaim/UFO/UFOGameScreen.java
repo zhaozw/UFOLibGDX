@@ -36,7 +36,7 @@ public class UFOGameScreen implements Screen {
 	   
       // load the drop sound effect and the rain background "music"
       dropSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/smb3_coin.wav"));
-      gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/Robert Miles - Children.mp3"));
+      gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/mega-man-wily-stage-1-2.mp3"));
 
       // start the playback of the background music immediately
       gameMusic.setLooping(true);
@@ -66,7 +66,7 @@ public class UFOGameScreen implements Screen {
       float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - ProjDrop.PROJECTILE_WIDTH);
       float velX = MathUtils.random(-10, 10);
             
-      ProjDrop p = new ProjDrop(x, UFOGameStart.SCREEN_HEIGHT, velX, -200);
+      ProjDrop p = new ProjDrop(x, UFOGameStart.SCREEN_HEIGHT, velX, -400);
       p.acceleration.x = MathUtils.random() * 50;
       
       projectiles.add(p);
@@ -166,8 +166,10 @@ public class UFOGameScreen implements Screen {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
-               Gdx.input.vibrate(75);
                dropSound.play();
+            }
+            if (p.getClass() == ProjDrop.class) {
+               Gdx.input.vibrate(75);
             }
             iter.remove();
          }

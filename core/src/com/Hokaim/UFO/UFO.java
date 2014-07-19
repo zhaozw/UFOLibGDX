@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.Vector3;
 
 public class UFO {
    
-   public static final int UFO_WIDTH = 64;
-   public static final int UFO_HEIGHT = 64;
+   public static final int UFO_WIDTH = 96;
+   public static final int UFO_HEIGHT = 96;
    
    public static final int ACCEL_SMOOTH = 4;   // Poss. values, 0 and up, 0 = no smoothing, 3-5 is good range
                                                 // Can also use to make slower ships, try 10

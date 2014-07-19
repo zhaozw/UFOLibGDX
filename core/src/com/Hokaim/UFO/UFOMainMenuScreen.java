@@ -3,7 +3,6 @@ package com.Hokaim.UFO;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 
@@ -23,7 +22,7 @@ public class UFOMainMenuScreen implements Screen {
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      background = new Background("Textures/Spaceship Alpha 1.png", 512, 275);  
+      background = new Background("Textures/Spaceship Alpha 1.png", 512, 275);
    }
 
    @Override

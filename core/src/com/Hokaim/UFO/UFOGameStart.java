@@ -8,8 +8,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class UFOGameStart extends Game {
-   public static final int SCREEN_WIDTH = 800;
-   public static final int SCREEN_HEIGHT = 480;
+   public static final int SCREEN_WIDTH = 1280;
+   public static final int SCREEN_HEIGHT = 720;
    public static Preferences prefs;
    SpriteBatch batch;
    BitmapFont font;
@@ -18,6 +18,7 @@ public class UFOGameStart extends Game {
       batch = new SpriteBatch();
       // Use LibGDX's default Arial font.
       font = new BitmapFont();
+      font.setScale(2);
       prefs = Gdx.app.getPreferences("gameplay");
       initPrefs();
       this.setScreen(new UFOMainMenuScreen(this));
