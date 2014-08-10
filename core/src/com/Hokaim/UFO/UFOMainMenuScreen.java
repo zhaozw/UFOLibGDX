@@ -16,7 +16,7 @@ public class UFOMainMenuScreen implements Screen {
    
    public UFOMainMenuScreen(final UFOGameStart gam) {
       game = gam;
-      
+
       Gdx.input.setCatchBackKey(false);
 
       camera = new OrthographicCamera();

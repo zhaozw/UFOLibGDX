@@ -21,4 +21,11 @@ public interface Projectile {
 
    public float getHeight();
 
+   public void setX(float x);
+
+   public void setY(float y);
+
+   public void setSize(float width, float height);
+
+   public void dispose();
 }

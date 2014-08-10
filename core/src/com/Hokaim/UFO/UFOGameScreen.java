@@ -1,6 +1,7 @@
 package com.Hokaim.UFO;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -20,18 +21,19 @@ public class UFOGameScreen implements Screen {
    Sound dropSound;
    Music gameMusic;
    OrthographicCamera camera;
-   Array<Projectile> projectiles;
+   LinkedList<Projectile> projectiles;
+   LinkedList<ProjDrop> projDropGarbage;
    long lastDropTime;
    boolean isPaused = false;
    int score;
-   UFO UFO;
+   UFO ufo;
    Background background;
 
    public UFOGameScreen(final UFOGameStart gam) {
 	   this.game = gam;
 	   Gdx.input.setCatchBackKey(true);
 	   
-	   UFO = new UFO("Textures/Spaceship Alpha 2.png");
+	   ufo = new UFO("Textures/Spaceship Alpha 2.png");
 	   background = new Background();
 	   
       // load the drop sound effect and the rain background "music"
@@ -45,8 +47,9 @@ public class UFOGameScreen implements Screen {
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      projectiles = new Array<Projectile>();
-      
+      projectiles = new LinkedList<Projectile>();
+
+      projDropGarbage = new LinkedList<ProjDrop>();
       spawnProjectile();
       
       //TODO: remove later
@@ -57,16 +60,23 @@ public class UFOGameScreen implements Screen {
       p.acceleration.x = MathUtils.random() * 50;
       
       projectiles.add(p);
-      
-      
+
    }
 
    private void spawnProjectile() {
       //TODO: Clean this function up, may want to consider multiple sizes for projectile?
       float x = MathUtils.random(0, UFOGameStart.SCREEN_WIDTH - ProjDrop.PROJECTILE_WIDTH);
       float velX = MathUtils.random(-10, 10);
-            
-      ProjDrop p = new ProjDrop(x, UFOGameStart.SCREEN_HEIGHT, velX, -400);
+
+      ProjDrop p;
+      if (!projDropGarbage.isEmpty()) {
+         p = projDropGarbage.pop();
+         p.setX(x);
+         p.setY(UFOGameStart.SCREEN_HEIGHT);
+         p.direction.set(velX, -400);
+      } else {
+         p = new ProjDrop(x, UFOGameStart.SCREEN_HEIGHT, velX, -400);
+      }
       p.acceleration.x = MathUtils.random() * 50;
       
       projectiles.add(p);
@@ -114,8 +124,8 @@ public class UFOGameScreen implements Screen {
       if (Gdx.input.isKeyPressed(Keys.BACK) || Gdx.input.isKeyPressed(Keys.ESCAPE))
          pause();
 
-      UFO.updateRotation();
-      UFO.moveUFO();
+      ufo.updateRotation();
+      ufo.moveUFO();
       moveProjectiles();
       renderScreen();
    }
@@ -133,21 +143,23 @@ public class UFOGameScreen implements Screen {
       game.batch.begin();
       game.batch.draw(background.backgroundSprite, 0, 0, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      UFO.sprite.draw(game.batch);
+      ufo.sprite.draw(game.batch);
 
       for (Projectile p: projectiles) {
          p.draw(game.batch);
       }
       game.font.draw(game.batch, "SCORE: " + score, UFOGameStart.SCREEN_WIDTH * 7 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
 
-      game.font.draw(game.batch, "numProjectiles: " + projectiles.size, UFOGameStart.SCREEN_WIDTH * 1 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
-      
+      game.font.draw(game.batch, "numProjectiles: " + projectiles.size(), UFOGameStart.SCREEN_WIDTH * 1 / 8, UFOGameStart.SCREEN_HEIGHT / 8);
+      // For debug purposes
+      game.font.draw(game.batch, "numGarbage: " + projDropGarbage.size(), UFOGameStart.SCREEN_WIDTH * 1 / 8, UFOGameStart.SCREEN_HEIGHT * 2 / 8);
+
       game.batch.end();
    }
    
    private void moveProjectiles() {
       // check if we need to create a new raindrop
-      if (TimeUtils.nanoTime() - lastDropTime > 250000000) spawnProjectile();
+      if (TimeUtils.nanoTime() - lastDropTime > 15000000) spawnProjectile();
 
       // move the projectiles, remove any that are beneath the bottom edge of
       // the screen or that hit the ufo. In the later case we play back
@@ -156,20 +168,29 @@ public class UFOGameScreen implements Screen {
       while (iter.hasNext()) {
          Projectile p = iter.next();
          p.updateProjectile();
-         if (p.getX() + p.getWidth() < 0) iter.remove();
-         else if (p.getX() > UFOGameStart.SCREEN_WIDTH) iter.remove();
-         else if (p.getY() + p.getHeight() < 0) iter.remove();
-//         if (p.sprite.getBoundingRectangle().overlaps(UFO.shape)) {
-//         if (UFO.collides(p.sprite.getBoundingRectangle())) {
-//         else if (UFO.collides(p.shape)) {
-         else if (p.collides(UFO.shape)) {
+         if (p.getX() + p.getWidth() < 0) {
+            iter.remove();
+            if (p.getClass() == (ProjDrop.class)) projDropGarbage.push((ProjDrop) p);
+         }
+         else if (p.getX() > UFOGameStart.SCREEN_WIDTH) {
+            iter.remove();
+            if (p.getClass() == (ProjDrop.class)) projDropGarbage.push((ProjDrop) p);
+         }
+         else if (p.getY() + p.getHeight() < 0) {
+            iter.remove();
+            if (p.getClass() == (ProjDrop.class)) projDropGarbage.push((ProjDrop) p);
+         }
+         else if (p.collides(ufo.shape)) {
             
             score++;
             if (UFOGameStart.prefs.getBoolean("playSounds")) {
                dropSound.play();
             }
             if (p.getClass() == ProjDrop.class) {
-               Gdx.input.vibrate(100);
+//               Gdx.input.vibrate(100);
+            }
+            if (p.getClass() == (ProjDrop.class)) {
+               projDropGarbage.push((ProjDrop) p);
             }
             iter.remove();
          }
@@ -181,6 +202,11 @@ public class UFOGameScreen implements Screen {
       // dispose of all the native resources
       dropSound.dispose();
       gameMusic.dispose();
+      background.dispose();
+      ufo.dispose();
+      for (Projectile p : projectiles) {
+         p.dispose();
+      }
    }
 
    @Override

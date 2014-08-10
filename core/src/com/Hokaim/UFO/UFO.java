@@ -22,7 +22,7 @@ public class UFO {
    
    static boolean isMoving = false;
       
-   Texture UFOImage;
+   Texture image;
    Circle shape;
    Sprite sprite;
    float rotation;
@@ -33,12 +33,12 @@ public class UFO {
       camera = new OrthographicCamera();
       camera.setToOrtho(false, UFOGameStart.SCREEN_WIDTH, UFOGameStart.SCREEN_HEIGHT);
       
-      UFOImage = new Texture(Gdx.files.internal(textureName));
+      image = new Texture(Gdx.files.internal(textureName));
       
       shape = new Circle();
       shape.setRadius(UFO_WIDTH / 2);
       
-      sprite = new Sprite(UFOImage);
+      sprite = new Sprite(image);
       sprite.setSize(UFO_WIDTH, UFO_HEIGHT);
       sprite.setOrigin(UFO_WIDTH / 2, UFO_HEIGHT / 2);
       sprite.setRotation(0);
@@ -114,5 +114,9 @@ public class UFO {
    // Uses collision libraries to determine collision for rectangles
    public boolean collides(Rectangle rectangle) {
       return Intersector.overlaps(shape, rectangle);
+   }
+
+   public void dispose() {
+      image.dispose();
    }
 }

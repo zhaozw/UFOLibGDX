@@ -98,7 +98,27 @@ public class ProjBucket implements Projectile {
    public float getHeight() {
       return sprite.getHeight();
    }
-   
+
+   @Override
+   public void setX(float x) {
+      sprite.setX(x);
+   }
+
+   @Override
+   public void setY(float y) {
+      sprite.setY(y);
+   }
+
+   @Override
+   public void setSize(float width, float height) {
+      sprite.setSize(width, height);
+   }
+
+   @Override
+   public void dispose() {
+      image.dispose();
+   }
+
    // Uses collision libraries to determine collision for circles
    public boolean collides(Circle circle) {
       return Intersector.overlaps(shape, circle);

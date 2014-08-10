@@ -37,4 +37,8 @@ public class Background {
       backgroundSprite.setOrigin(backgroundSprite.getWidth()/2, backgroundSprite.getHeight()/2);
       backgroundSprite.setPosition(-backgroundSprite.getWidth()/2, -backgroundSprite.getHeight()/2);
    }
+
+   public void dispose() {
+      backgroundImage.dispose();
+   }
 }
